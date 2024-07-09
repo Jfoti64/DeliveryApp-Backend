@@ -55,6 +55,25 @@ export const getItemById = asyncHandler(async (req, res) => {
   res.status(200).json(item);
 });
 
+// Search items
+export const searchItems = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+  if (!q) {
+    return res.status(400).json({ message: 'Search query is required' });
+  }
+
+  try {
+    const items = await Item.find({
+      title: { $regex: q, $options: 'i' }, // Case-insensitive search
+    });
+
+    res.json(items);
+  } catch (error) {
+    console.error('Error searching items:', error); // Log the error
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update an item
 export const updateItem = [
   check('title', 'Title is required').optional().not().isEmpty(),

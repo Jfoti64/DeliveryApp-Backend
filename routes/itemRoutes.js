@@ -1,3 +1,4 @@
+// src/routes/itemRoutes.js
 import express from 'express';
 import {
   createItem,
@@ -6,22 +7,18 @@ import {
   updateItem,
   deleteItem,
   getItemsByCategory,
+  searchItems,
 } from '../controllers/itemController.js';
-import auth from '../middleware/auth.js'; // Ensure this path is correct
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.get('/', getItemsByCategory); // Removed auth for testing purposes
+router.get('/search', searchItems); // Define search route before routes with parameters
 
-router
-  .route('/')
-  .post(auth, createItem) // Protect this route with the auth middleware
-  .get(getItems);
+router.get('/', getItemsByCategory);
 
-router
-  .route('/:itemId')
-  .get(getItemById)
-  .put(auth, updateItem) // Protect this route with the auth middleware
-  .delete(auth, deleteItem); // Protect this route with the auth middleware
+router.route('/').post(auth, createItem).get(getItems);
+
+router.route('/:itemId').get(getItemById).put(auth, updateItem).delete(auth, deleteItem);
 
 export default router;
