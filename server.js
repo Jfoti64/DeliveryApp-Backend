@@ -46,7 +46,7 @@ app.use(cors(corsOptions));
 
 // Routes
 app.use('/api/auth', authRoutes); // Authentication routes
-app.use('/items', itemRoutes); // Item routes
+app.use('/api/items', itemRoutes); // Item routes
 
 // Basic route
 app.get('/', (req, res) => {
