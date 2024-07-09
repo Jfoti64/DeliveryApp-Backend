@@ -39,6 +39,13 @@ export const getItems = asyncHandler(async (req, res) => {
   res.status(200).json(items);
 });
 
+// Get items by category
+export const getItemsByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.query;
+  const items = await Item.find({ category });
+  res.status(200).json(items);
+});
+
 // Get a specific item by ID
 export const getItemById = asyncHandler(async (req, res) => {
   const item = await Item.findById(req.params.itemId);

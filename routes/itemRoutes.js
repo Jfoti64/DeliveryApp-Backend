@@ -1,4 +1,3 @@
-// src/routes/itemRoutes.js
 import express from 'express';
 import {
   createItem,
@@ -6,10 +5,13 @@ import {
   getItemById,
   updateItem,
   deleteItem,
+  getItemsByCategory,
 } from '../controllers/itemController.js';
 import auth from '../middleware/auth.js'; // Ensure this path is correct
 
 const router = express.Router();
+
+router.get('/', getItemsByCategory); // Removed auth for testing purposes
 
 router
   .route('/')
