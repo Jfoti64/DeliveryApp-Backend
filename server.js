@@ -11,9 +11,7 @@ import cors from 'cors';
 dotenv.config();
 
 // Import configurations and routes after dotenv.config()
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import postRoutes from './routes/postRoutes.js';
+import itemRoutes from './routes/itemRoutes.js';
 
 const app = express();
 
@@ -46,9 +44,7 @@ app.use(cors(corsOptions));
 // app.use(helmet());
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/posts', postRoutes);
+app.use('/items', itemRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

@@ -1,0 +1,96 @@
+import Item from '../models/Item.js';
+import asyncHandler from 'express-async-handler';
+import { check, validationResult } from 'express-validator';
+
+// Create a new item
+export const createItem = [
+  check('title', 'Title is required').not().isEmpty(),
+  check('description', 'Description is required').not().isEmpty(),
+  check('price', 'Price is required').isFloat({ gt: 0 }),
+  check('category', 'Category is required').not().isEmpty(),
+  check('image', 'Image URL is required').not().isEmpty(),
+  check('stockQuantity', 'Stock Quantity is required').isInt({ min: 0 }),
+
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { title, description, price, category, image, stockQuantity } = req.body;
+
+    const newItem = new Item({
+      title,
+      description,
+      price,
+      category,
+      image,
+      stockQuantity,
+    });
+
+    const savedItem = await newItem.save();
+    res.status(201).json(savedItem);
+  }),
+];
+
+// Get all items
+export const getItems = asyncHandler(async (req, res) => {
+  const items = await Item.find();
+  res.status(200).json(items);
+});
+
+// Get a specific item by ID
+export const getItemById = asyncHandler(async (req, res) => {
+  const item = await Item.findById(req.params.itemId);
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+  res.status(200).json(item);
+});
+
+// Update an item
+export const updateItem = [
+  check('title', 'Title is required').optional().not().isEmpty(),
+  check('description', 'Description is required').optional().not().isEmpty(),
+  check('price', 'Price is required').optional().isFloat({ gt: 0 }),
+  check('category', 'Category is required').optional().not().isEmpty(),
+  check('image', 'Image URL is required').optional().not().isEmpty(),
+  check('stockQuantity', 'Stock Quantity is required').optional().isInt({ min: 0 }),
+
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { title, description, price, category, image, stockQuantity } = req.body;
+
+    const item = await Item.findById(req.params.itemId);
+
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    item.title = title || item.title;
+    item.description = description || item.description;
+    item.price = price || item.price;
+    item.category = category || item.category;
+    item.image = image || item.image;
+    item.stockQuantity = stockQuantity || item.stockQuantity;
+
+    const updatedItem = await item.save();
+    res.json(updatedItem);
+  }),
+];
+
+// Delete an item
+export const deleteItem = asyncHandler(async (req, res) => {
+  const item = await Item.findById(req.params.itemId);
+
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+
+  await item.remove();
+  res.json({ message: 'Item removed' });
+});
