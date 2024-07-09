@@ -11,6 +11,7 @@ import cors from 'cors';
 dotenv.config();
 
 // Import configurations and routes after dotenv.config()
+import authRoutes from './routes/authRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
 
 const app = express();
@@ -44,16 +45,12 @@ app.use(cors(corsOptions));
 // app.use(helmet());
 
 // Routes
-app.use('/items', itemRoutes);
+app.use('/api/auth', authRoutes); // Authentication routes
+app.use('/items', itemRoutes); // Item routes
 
 // Basic route
 app.get('/', (req, res) => {
   res.send('Welcome to SocialNet API');
-});
-
-// Test CORS route
-app.get('/test-cors', (req, res) => {
-  res.json({ message: 'CORS is working!' });
 });
 
 // Connect to MongoDB
