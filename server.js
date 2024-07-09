@@ -13,6 +13,7 @@ dotenv.config();
 // Import configurations and routes after dotenv.config()
 import authRoutes from './routes/authRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use(cors(corsOptions));
 // Routes
 app.use('/api/auth', authRoutes); // Authentication routes
 app.use('/api/items', itemRoutes); // Item routes
+app.use('/api/categories', categoryRoutes); // Category routes
 
 // Basic route
 app.get('/', (req, res) => {
