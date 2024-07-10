@@ -20,13 +20,16 @@ export const registerUser = [
   check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
 
   asyncHandler(async (req, res) => {
+    // Log the received payload for debugging
+    console.log('Received payload on backend:', req.body);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { firstName, lastName, email, password } = req.body;
-
+    const isAdmin = true;
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -34,11 +37,14 @@ export const registerUser = [
       throw new Error('User already exists');
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       firstName,
       lastName,
       email,
-      password,
+      password: hashedPassword,
+      isAdmin,
     });
 
     if (user) {
@@ -47,6 +53,7 @@ export const registerUser = [
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        isAdmin: true,
         token: generateToken(user._id),
       });
     } else {

@@ -117,6 +117,6 @@ export const deleteItem = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Item not found' });
   }
 
-  await item.remove();
+  await Item.deleteOne({ _id: req.params.itemId });
   res.json({ message: 'Item removed' });
 });
