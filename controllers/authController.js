@@ -102,3 +102,36 @@ export const getUserProfile = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 });
+
+// Update user profile
+export const updateUserProfile = [
+  check('firstName', 'First name is required').not().isEmpty(),
+  check('lastName', 'Last name is required').not().isEmpty(),
+
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.firstName = req.body.firstName || user.firstName;
+      user.lastName = req.body.lastName || user.lastName;
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        token: req.token,
+      });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  }),
+];

@@ -12,7 +12,7 @@ const auth = asyncHandler(async (req, res, next) => {
       req.user = await User.findById(decoded.id).select('-password');
       next();
     } catch (error) {
-      console.error(error);
+      console.error('Token verification failed:', error); // Debugging line
       res.status(401);
       throw new Error('Not authorized, token failed');
     }
