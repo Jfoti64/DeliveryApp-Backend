@@ -14,6 +14,7 @@ dotenv.config();
 import authRoutes from './routes/authRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use(cors(corsOptions));
 app.use('/api/auth', authRoutes); // Authentication routes
 app.use('/api/items', itemRoutes); // Item routes
 app.use('/api/categories', categoryRoutes); // Category routes
+app.use('/api/orders', orderRoutes); // Order Routes
 
 // Basic route
 app.get('/', (req, res) => {
