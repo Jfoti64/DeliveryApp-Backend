@@ -7,6 +7,7 @@ import {
   updateItem,
   deleteItem,
   getItemsByCategory,
+  getItemsByStoreName,
   searchItems,
 } from '../controllers/itemController.js';
 import auth from '../middleware/auth.js';
@@ -15,7 +16,9 @@ const router = express.Router();
 
 router.get('/search', searchItems); // Define search route before routes with parameters
 
-router.get('/', getItemsByCategory);
+router.get('/categories', getItemsByCategory);
+
+router.get('/storeName', getItemsByStoreName);
 
 router.route('/').post(auth, createItem).get(getItems);
 

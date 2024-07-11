@@ -50,7 +50,9 @@ export const getItemsByCategory = asyncHandler(async (req, res) => {
 
 // Get items by storeName
 export const getItemsByStoreName = asyncHandler(async (req, res) => {
+  console.log(req.query);
   const { storeName } = req.query;
+  console.log(storeName);
   const items = await Item.find({ storeName });
   res.status(200).json(items);
 });
