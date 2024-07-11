@@ -22,3 +22,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+// Get orders for the authenticated user
+export const getUserOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ user: req.user._id });
+  res.json(orders);
+});
