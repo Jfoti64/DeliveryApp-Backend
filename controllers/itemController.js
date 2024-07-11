@@ -10,6 +10,7 @@ export const createItem = [
   check('category', 'Category is required').not().isEmpty(),
   check('image', 'Image URL is required').not().isEmpty(),
   check('stockQuantity', 'Stock Quantity is required').isInt({ min: 0 }),
+  check('storeName', 'StoreName is required').not().isEmpty(),
 
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -17,7 +18,7 @@ export const createItem = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, description, price, category, image, stockQuantity } = req.body;
+    const { title, description, price, category, image, stockQuantity, storeName } = req.body;
 
     const newItem = new Item({
       title,
@@ -26,6 +27,7 @@ export const createItem = [
       category,
       image,
       stockQuantity,
+      storeName,
     });
 
     const savedItem = await newItem.save();
@@ -43,6 +45,13 @@ export const getItems = asyncHandler(async (req, res) => {
 export const getItemsByCategory = asyncHandler(async (req, res) => {
   const { category } = req.query;
   const items = await Item.find({ category });
+  res.status(200).json(items);
+});
+
+// Get items by storeName
+export const getItemsByStoreName = asyncHandler(async (req, res) => {
+  const { storeName } = req.query;
+  const items = await Item.find({ storeName });
   res.status(200).json(items);
 });
 
@@ -82,6 +91,7 @@ export const updateItem = [
   check('category', 'Category is required').optional().not().isEmpty(),
   check('image', 'Image URL is required').optional().not().isEmpty(),
   check('stockQuantity', 'Stock Quantity is required').optional().isInt({ min: 0 }),
+  check('storeName', 'StoreName is required').optional().not().isEmpty(),
 
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -89,7 +99,7 @@ export const updateItem = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, description, price, category, image, stockQuantity } = req.body;
+    const { title, description, price, category, image, stockQuantity, storeName } = req.body;
 
     const item = await Item.findById(req.params.itemId);
 
@@ -103,6 +113,7 @@ export const updateItem = [
     item.category = category || item.category;
     item.image = image || item.image;
     item.stockQuantity = stockQuantity || item.stockQuantity;
+    item.storeName = storeName || item.storeName;
 
     const updatedItem = await item.save();
     res.json(updatedItem);

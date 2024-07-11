@@ -34,6 +34,10 @@ const itemSchema = new Schema(
       type: Number,
       default: 0,
     },
+    storeName: {
+      type: String,
+      required: true,
+    },
     // Add any additional fields as needed like reviews
   },
   {

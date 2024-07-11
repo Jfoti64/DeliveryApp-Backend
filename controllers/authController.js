@@ -29,7 +29,7 @@ export const registerUser = [
     }
 
     const { firstName, lastName, email, password } = req.body;
-    const isAdmin = true;
+    const isAdmin = false;
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -53,7 +53,7 @@ export const registerUser = [
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isAdmin: true,
+        isAdmin: false,
         token: generateToken(user._id),
       });
     } else {
