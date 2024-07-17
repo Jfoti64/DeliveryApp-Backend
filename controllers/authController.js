@@ -13,14 +13,12 @@ const generateToken = (id) => {
 
 // Register new user
 export const registerUser = [
-  // Validation rules
   check('firstName', 'First name is required').not().isEmpty(),
   check('lastName', 'Last name is required').not().isEmpty(),
   check('email', 'Please include a valid email').isEmail(),
   check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
 
   asyncHandler(async (req, res) => {
-    // Log the received payload for debugging
     console.log('Received payload on backend:', req.body);
 
     const errors = validationResult(req);
@@ -29,21 +27,21 @@ export const registerUser = [
     }
 
     const { firstName, lastName, email, password } = req.body;
-    const isAdmin = false;
+    const isAdmin = true;
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      res.status(400);
-      throw new Error('User already exists');
+      res.status(400).json({ message: 'User already exists' });
+      return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    //const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password,
       isAdmin,
     });
 
@@ -53,12 +51,11 @@ export const registerUser = [
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isAdmin: false,
+        isAdmin: true,
         token: generateToken(user._id),
       });
     } else {
-      res.status(400);
-      throw new Error('Invalid user data');
+      res.status(400).json({ message: 'Invalid user data' });
     }
   }),
 ];
@@ -69,6 +66,7 @@ export const authUser = [
   check('password', 'Password is required').exists(),
 
   asyncHandler(async (req, res) => {
+    console.log('Received payload on backend:', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -78,17 +76,17 @@ export const authUser = [
 
     const user = await User.findOne({ email });
 
-    if (user && (await user.comparePassword(password))) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        isAdmin: user.isAdmin,
         token: generateToken(user._id),
       });
     } else {
-      res.status(401);
-      throw new Error('Invalid email or password');
+      res.status(401).json({ message: 'Invalid email or password' });
     }
   }),
 ];
@@ -103,10 +101,10 @@ export const getUserProfile = asyncHandler(async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      isAdmin: user.isAdmin,
     });
   } else {
-    res.status(404);
-    throw new Error('User not found');
+    res.status(404).json({ message: 'User not found' });
   }
 });
 
@@ -134,11 +132,11 @@ export const updateUserProfile = [
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         email: updatedUser.email,
-        token: req.token,
+        isAdmin: updatedUser.isAdmin,
+        token: generateToken(updatedUser._id),
       });
     } else {
-      res.status(404);
-      throw new Error('User not found');
+      res.status(404).json({ message: 'User not found' });
     }
   }),
 ];
