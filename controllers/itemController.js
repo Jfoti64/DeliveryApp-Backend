@@ -1,4 +1,5 @@
 import Item from '../models/Item.js';
+import Store from '../models/Store.js'; // Import the Store model
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
 
@@ -15,10 +16,20 @@ export const createItem = [
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { title, description, price, category, image, stockQuantity, storeName } = req.body;
+    console.log('Received item data:', req.body); // Log the received item data
+
+    // Check if the store exists
+    let store = await Store.findOne({ name: storeName });
+    if (!store) {
+      // If the store does not exist, create it
+      store = new Store({ name: storeName, bannerImage: 'https://via.placeholder.com/1200x300' });
+      await store.save();
+    }
 
     const newItem = new Item({
       title,
