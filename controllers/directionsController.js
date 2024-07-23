@@ -1,5 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import eventEmitter from '../emitters/eventEmitter.js';
 
 dotenv.config();
 
@@ -30,6 +31,9 @@ export const getDirections = async (req, res) => {
       } else {
         return { data: response.data };
       }
+
+      // Emit directions event with fetched data
+      eventEmitter.emit('directions', { origin, destination, data: response.data });
     } else {
       throw new Error(response.data.error_message || 'Failed to fetch directions');
     }

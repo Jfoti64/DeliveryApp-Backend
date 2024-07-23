@@ -1,7 +1,8 @@
+// webSocketServer.js
 import { WebSocketServer } from 'ws';
 import polyline from '@mapbox/polyline';
 import dotenv from 'dotenv';
-import { getDirections } from '../controllers/directionsController.js';
+import eventEmitter from '../emitters/eventEmitter.js';
 
 dotenv.config();
 
@@ -11,15 +12,13 @@ let polylinePoints = []; // Store polyline points
 const startWebSocketServer = (server) => {
   const wss = new WebSocketServer({ server });
 
-  wss.on('connection', async (ws) => {
+  wss.on('connection', (ws) => {
     console.log('Client connected');
 
-    try {
-      await initializePolyline();
+    if (polylinePoints.length > 0) {
       startDriverSimulation(ws);
-    } catch (error) {
-      console.error('Error during WebSocket connection:', error);
-      ws.send(JSON.stringify({ error: 'Failed to initialize driver simulation' }));
+    } else {
+      ws.send(JSON.stringify({ error: 'No directions available yet' }));
     }
 
     ws.on('close', () => {
@@ -30,20 +29,18 @@ const startWebSocketServer = (server) => {
   return wss;
 };
 
-const initializePolyline = async () => {
-  const origin = `${driverLocation.lat},${driverLocation.lng}`;
-  const destination = '25.7220991,-80.4433866'; // Example destination
-
+// Listen for directions event
+eventEmitter.on('directions', ({ data }) => {
   try {
-    const { data } = await getDirections({ query: { origin, destination } });
     const steps = data.routes[0].legs[0].steps;
     polylinePoints = steps.flatMap((step) =>
       polyline.decode(step.polyline.points).map(([lat, lng]) => ({ lat, lng }))
     );
+    console.log('Polyline initialized with new directions');
   } catch (error) {
-    throw new Error('Error getting directions: ' + error.message);
+    console.error('Error decoding polyline points:', error);
   }
-};
+});
 
 const startDriverSimulation = (ws) => {
   let stepIndex = 0;
